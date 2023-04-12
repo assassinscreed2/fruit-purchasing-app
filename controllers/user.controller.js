@@ -71,14 +71,16 @@ async function login(req,res){
                 console.log(row)
                 if(row.length !== 0){
                     const password = row[0].password
+                    sqlConnection.query('insert into logindata set ?',{username},(err,row,field)=>{
 
-                    if(!compareSync(req.body.password,password)){
-                        return res.json({message:"Incorrect Password"})
-                    }
-
-                    const secret = "@123%abcd123"
-                    const token = jwt.sign({username:username},secret)
-                    return res.json({message:"Logged In successfully",token:token})
+                        if(!compareSync(req.body.password,password)){
+                            return res.json({message:"Incorrect Password"})
+                        }
+    
+                        const secret = "@123%abcd123"
+                        const token = jwt.sign({username:username},secret)
+                        return res.json({message:"Logged In successfully",token:token})
+                    })
                 }else{
                     return res.json({message:"no user exists"})
                 }
@@ -90,4 +92,26 @@ async function login(req,res){
     })
 }
 
-module.exports = {signup,login}
+async function addMoney(req,res){
+    const usernamme = req.user;
+    console.log(usernamme)
+    const wallet = req.body.wallet;
+    sqlConnection.query('update userdata set wallet = wallet+? where username = ?',[wallet,usernamme.username],async (err,row,field)=>{
+        if(!err){
+            const transaction = {
+                timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                type: "deposite",
+                amount: wallet
+            }
+
+            await db.collection("transactions").add(transaction)
+
+            res.json({message:"Money added successfully"})
+        }else{
+            console.log(err)
+            res.json({error:err})
+        }
+    })
+}
+
+module.exports = {signup,login,addMoney}
