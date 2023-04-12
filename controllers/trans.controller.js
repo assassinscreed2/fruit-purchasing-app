@@ -78,7 +78,6 @@ async function buyFruit(req,res){
 
                             if(quantity >= req.body.quantity){
                                 if(wallet >= rate*req.body.quantity){
-                                    // all condition are fullfilled 
 
                                     sqlConnection.query('update userdata set wallet = wallet - ?',[rate*req.body.quantity],(err,row,field)=>{
                                         if(!err){

@@ -87,22 +87,37 @@ async function addMoney(req,res){
 
     console.log(usernamme)
     const wallet = req.body.wallet;
-    sqlConnection.query('update userdata set wallet = wallet+? where username = ?',[wallet,usernamme.username],async (err,row,field)=>{
+
+    sqlConnection.query('select category,wallet from userdata where username = ?',[username],(err,row,field)=>{
         if(!err){
-            const transaction = {
-                timestamp: admin.firestore.FieldValue.serverTimestamp(),
-                type: "deposite",
-                amount: wallet
+            const category = row[0].category
+            if(category === "both" || category === "buyer"){
+                sqlConnection.query('update userdata set wallet = wallet+? where username = ?',[wallet,usernamme.username],async (err,row,field)=>{
+                    if(!err){
+                        const transaction = {
+                            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                            type: "deposite",
+                            amount: wallet
+                        }
+            
+                        await db.collection("transactions").add(transaction)
+            
+                        res.json({message:"Money added successfully"})
+                    }else{
+                        console.log(err)
+                        res.json({error:err})
+                    }
+                })
+            }else{
+                return res.json({message:"you are not a buyer"})
             }
-
-            await db.collection("transactions").add(transaction)
-
-            res.json({message:"Money added successfully"})
         }else{
             console.log(err)
             res.json({error:err})
         }
     })
+
+    
 }
 
 module.exports = {signup,login,addMoney}
