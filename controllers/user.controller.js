@@ -1,6 +1,8 @@
 const admin = require('firebase-admin')
 const credentials = require('../key.json')
 const mysql = require('mysql')
+const jwt = require('jsonwebtoken')
+const {hashSync,compareSync} = require('bcrypt')
 
 // database connections
 
@@ -25,7 +27,6 @@ sqlConnection.connect((err)=>{
     }
 })
 
-
 // controllers
 
 async function signup(req,res){
@@ -44,21 +45,49 @@ async function signup(req,res){
             let count = row[0].count
             if(count !== 0){
                 return res.json({message: "user with this username already exist"})
+            }else{
+                const newpassword = hashSync(req.body.password,10)
+                sqlConnection.query(`insert into userdata set ?`, {...req.body,password:newpassword}, (err,row,field)=>{
+                    if(!err){
+                        return res.json({row:row})
+                    }else{
+                        console.log(err)
+                        return res.send(err)
+                    }
+                })
             }
             }
         else{
-            console.log(err)
-        }
-    })
-
-    sqlConnection.query(`insert into userdata set ?`, req.body, (err,row,field)=>{
-        if(!err){
-            return res.json({row:row})
-        }else{
             console.log(err)
             return res.send(err)
         }
     })
 }
 
-module.exports = {signup}
+async function login(req,res){
+    const username = req.body.username
+    sqlConnection.query(`select username,password from userdata where username = ?`,[username],(err,row,field)=>{
+        if(!err){
+                console.log(row)
+                if(row.length !== 0){
+                    const password = row[0].password
+
+                    if(!compareSync(req.body.password,password)){
+                        return res.json({message:"Incorrect Password"})
+                    }
+
+                    const secret = "@123%abcd123"
+                    const token = jwt.sign({username:username},secret)
+                    return res.json({message:"Logged In successfully",token:token})
+                }else{
+                    return res.json({message:"no user exists"})
+                }
+            }
+        else{
+            console.log(err)
+            return res.send(err)
+        }
+    })
+}
+
+module.exports = {signup,login}
