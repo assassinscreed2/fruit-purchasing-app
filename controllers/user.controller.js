@@ -1,42 +1,23 @@
-const admin = require('firebase-admin')
-const credentials = require('../key.json')
-const mysql = require('mysql')
+const {admin,db,sqlConnection} = require('../db/db.connections')
 const jwt = require('jsonwebtoken')
 const {hashSync,compareSync} = require('bcrypt')
 
 // database connections
 
-admin.initializeApp({
-    credential: admin.credential.cert(credentials)
-})
+// util functions
 
-const db = admin.firestore();
+function allPresent(requiredProperties,givenProperties){
+    return requiredProperties.every((property) => property in givenProperties)
+}
 
-const sqlConnection = mysql.createConnection({
-    host:'localhost',
-    user:'root',
-    password:'password',
-    database:'fruitshopdata'
-})
-
-sqlConnection.connect((err)=>{
-    if(!err){
-        console.log("connected successfuly")
-    }else{
-        console.log("connection failed")
-    }
-})
 
 // controllers
 
 async function signup(req,res){
     const username = req.body.username
     console.log(req.body)
-    const requiredProperties = ["name", "address", "email", "phoneNumber", "category", "username", "password"]
-
-    const allPresent = requiredProperties.every((property) => property in req.body)
     
-    if(!allPresent){
+    if(!allPresent(["name", "address", "email", "phoneNumber", "category", "username", "password"],req.body)){
         return res.json({message:'enter all required fields ["name", "address", "email", "phoneNumber", "category", "username", "password"]'})
     }
 
@@ -65,6 +46,11 @@ async function signup(req,res){
 }
 
 async function login(req,res){
+
+    if(!allPresent(["username", "password"],req.body)){
+        return res.json({message:'enter all required fields ["username", "password"]'})
+    }
+
     const username = req.body.username
     sqlConnection.query(`select username,password from userdata where username = ?`,[username],(err,row,field)=>{
         if(!err){
@@ -94,6 +80,11 @@ async function login(req,res){
 
 async function addMoney(req,res){
     const usernamme = req.user;
+
+    if(!allPresent(["wallet"],req.body)){
+        return res.json({message:'enter all required fields ["wallet"]'})
+    }
+
     console.log(usernamme)
     const wallet = req.body.wallet;
     sqlConnection.query('update userdata set wallet = wallet+? where username = ?',[wallet,usernamme.username],async (err,row,field)=>{
