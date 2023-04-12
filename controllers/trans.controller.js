@@ -95,6 +95,7 @@ async function buyFruit(req,res){
                                                     const sellingData = {
                                                         timestamp: admin.firestore.FieldValue.serverTimestamp(),
                                                         fruit: req.body.name,
+                                                        quantity: req.body.quantity
                                                     }
 
                                                     await db.collection("sellingdata").add(sellingData)
