@@ -6,6 +6,7 @@ const validateAuthentication = (req,res,next) => {
     if(!token){
         return res.json({message:"Not Authorized"})
     }
+    
 
     const secret = "@123%abcd123"
 
