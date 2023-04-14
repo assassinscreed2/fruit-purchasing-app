@@ -1,4 +1,5 @@
 const {admin,db,sqlConnection} = require('../db/db.connections')
+const ImageKit = require('imagekit')
 
 function getTotalUsers(){
     return new Promise((resolve,reject)=>{
@@ -102,19 +103,45 @@ async function mostSoldFruit(){
     
 }
 
-async function signedLastWeek(){
-    
+async function signedLastWeek(type){
+    const currentDay = (new Date(Date.now())).getDay()
+    const previousWeekMonday = new Date(Date.now()-((7+currentDay-1)*(86400000)))
+    const thisWeekMonday = new Date(Date.now()-((currentDay-1)*(86400000)))
+
+    return new Promise((resolve,reject)=>{
+        sqlConnection.query('select count(*) as count from userdata where created >= ? and created < ?',[previousWeekMonday,thisWeekMonday],(err,row,field)=>{
+            if(!err){
+                const count = row[0].count
+                resolve({signedLastWeek:count})
+            }else{
+                console.log(err)
+                reject(err)
+            }
+        })
+    })
 }
 
 async function loggedInLastWeek(){
-    
+    const currentDay = (new Date(Date.now())).getDay()
+    const previousWeekMonday = new Date(Date.now()-((7+currentDay-1)*(86400000)))
+    const thisWeekMonday = new Date(Date.now()-((currentDay-1)*(86400000)))
+
+    return new Promise((resolve,reject)=>{
+        sqlConnection.query('select count(*) as count from logindata where logindate >= ? and logindate < ?',[previousWeekMonday,thisWeekMonday],(err,row,field)=>{
+            if(!err){
+                const count = row[0].count
+                resolve({loggedLastWeek:count})
+            }else{
+                console.log(err)
+                reject(err)
+            }
+        })
+    })
 }
 
-async function soldOnPerticularDate(starttiming,endtiming){
+async function soldOnBetweenDate(starttiming,endtiming){
 
     const startDate = new Date(starttiming);
-
-    console.log(endtiming === undefined)
 
     let endDate = null;
     
@@ -125,12 +152,7 @@ async function soldOnPerticularDate(starttiming,endtiming){
         endDate = new Date(endtiming)
     }
 
-    console.log(endDate)
-
-    const startTimestamp = admin.firestore.Timestamp.fromDate(startDate);
-    const endTimestamp = admin.firestore.Timestamp.fromDate(endDate);
-
-    return db.collection('sellingdata').where('timestamp', '>=', startTimestamp).where('timestamp', '<', endTimestamp).get().then((querySnapshot) => {
+    return db.collection('sellingdata').where('timestamp', '>=', startDate).where('timestamp', '<', endDate).get().then((querySnapshot) => {
 
         let fruitsSet = new Set()
 
@@ -148,29 +170,6 @@ async function soldOnPerticularDate(starttiming,endtiming){
         console.error('Error getting documents: ', error);
     });
 
-}
-
-async function soldBetweenTime(){
-    const startTime = "2023-04-13 11:06:02";
-    const endTime = "2023-04-13 11:08:12";
-
-const startDate = new Date(startTime);
-
-const startTimestamp = admin.firestore.Timestamp.fromDate(startDate);
-const endTimestamp = admin.firestore.Timestamp.fromDate(endDate);
-
-db.collection('sellingdata')
-  .where('timestamp', '>=', startTimestamp)
-  .where('timestamp', '<=', endTimestamp)
-  .get()
-  .then((querySnapshot) => {
-    querySnapshot.forEach((doc) => {
-      console.log(doc.data().fruit);
-    });
-  })
-  .catch((error) => {
-    console.error('Error getting documents: ', error);
-  });
 }
 
 async function unsoldFruit(){
@@ -248,14 +247,55 @@ function userFruitSellers(username){
     }).catch(e=>{return {error:e}})
 }
 
+async function uploadImage(binaryimage){
+    return new Promise((resolve,reject)=>{
+        let imagekit = new ImageKit({
+            publicKey:"public_dY0x6vEYpa+ZqYhH8dUulAf9mFM=",
+            privateKey:"private_FNehE+mVzzLXYrqR4Ja4KeCXMrk=",
+            urlEndpoint:"https://ik.imagekit.io/jvcpvrsy2/"
+        })
+    
+        imagekit.upload({
+            file:binaryimage,
+            fileName:"apple",
+        },(err,res)=>{
+            if(!err){
+                resolve(res)
+            }else{
+                reject(err)
+            }
+        })
+    })
+}
+
+async function getFruitImageUrl(name,seller){
+    return new Promise((resolve,reject)=>{
+        sqlConnection.query('select fruitImage from fruitdata where name = ? and username = ?',[name,seller],(err,row,field)=>{
+            if(!err){
+                if(row.length === 0){
+                    resolve({message:"not found"})
+                }else{
+                    resolve({message:"found",imageUrl:row[0].fruitImage})
+                }
+            }else{
+                console.log(err)
+                reject({error:err})
+            }
+        })
+    })
+}
+
 module.exports = {
     getTotalUsers,
     getTotalSellers,
     getTotalBuyer,
     notLoggedAferSignup,
     mostSoldFruit,
-    soldOnPerticularDate,
-    soldBetweenTime,
     unsoldFruit,
-    userFruitSellers
+    userFruitSellers,
+    soldOnBetweenDate,
+    signedLastWeek,
+    loggedInLastWeek,
+    uploadImage,
+    getFruitImageUrl
 }

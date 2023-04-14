@@ -1,0 +1,74 @@
+papaya: https://ik.imagekit.io/jvcpvrsy2/papaya.jpg?updatedAt=1681406372898
+mango: https://ik.imagekit.io/jvcpvrsy2/mango.jpg?updatedAt=1681406372249
+pomegranate: https://ik.imagekit.io/jvcpvrsy2/pomegranate.jpg?updatedAt=1681406370831
+dragonfruit: https://ik.imagekit.io/jvcpvrsy2/dragonfruit.jpg?updatedAt=1681406373170
+grapes: https://ik.imagekit.io/jvcpvrsy2/grapes.jpg?updatedAt=1681406371228
+watermellon: https://ik.imagekit.io/jvcpvrsy2/watermellon.jpg?updatedAt=1681406368349
+banana: https://ik.imagekit.io/jvcpvrsy2/banana.jpg?updatedAt=1681406367956
+apple: https://ik.imagekit.io/jvcpvrsy2/apple.jpg?updatedAt=1681406368108
+strawberry: https://ik.imagekit.io/jvcpvrsy2/strawberry.jpg?updatedAt=1681406367550
+
+{
+    "name":"Rohan",
+    "address":"Gujrat",
+    "email":"rohan@gmail.com",
+    "profileImage":"https://ik.imagekit.io/jvcpvrsy2/rohan.png?updatedAt=1681406824037",
+    "phoneNumber":"1111222277",
+    "category":"seller",
+    "username":"rohan",
+    "password":"abcd1234"
+
+}
+{
+    "name":"Luffy",
+    "address":"Chennai",
+    "email":"luffy@gmail.com",
+    "profileImage":"https://ik.imagekit.io/jvcpvrsy2/luffy.png?updatedAt=1681406833425",
+    "phoneNumber":"1111222299",
+    "category":"seller",
+    "username":"luffy",
+    "password":"abcd1234"
+
+}
+{
+    "name":"Ravi",
+    "address":"Gwalior",
+    "email":"ravi@gmail.com",
+    "profileImage":"https://ik.imagekit.io/jvcpvrsy2/ravi.png?updatedAt=1681406832764",
+    "phoneNumber":"1111222233",
+    "category":"both",
+    "username":"ravi",
+    "password":"abcd1234"
+
+}
+{
+    "name":"Rahul",
+    "address":"Delhi",
+    "email":"rahul@gmail.com",
+    "profileImage":"https://ik.imagekit.io/jvcpvrsy2/rahul.jpg?updatedAt=1681406820983",
+    "phoneNumber":"1111222244",
+    "category":"both",
+    "username":"rahul",
+    "password":"abcd1234"
+}{
+    "name":"Nami",
+    "address":"Rajasthan",
+    "email":"nami@gmail.com",
+    "profileImage":"https://ik.imagekit.io/jvcpvrsy2/nami.jpg?updatedAt=1681406821033",
+    "phoneNumber":"1111222255",
+    "category":"buyer",
+    "username":"nami",
+    "password":"abcd1234"
+
+}
+{
+    "name":"Vikram",
+    "address":"Noida",
+    "email":"vikram@gmail.com",
+    "profileImage":"https://ik.imagekit.io/jvcpvrsy2/vikram.jpg?updatedAt=1681406821049",
+    "phoneNumber":"1111222266",
+    "category":"buyer",
+    "username":"vikram",
+    "password":"abcd1234"
+
+}
